@@ -1,11 +1,11 @@
 # Bridge 首次发布 Cheat Sheet
 
-复制下面命令逐条执行。占位符只有一个：`<你的GitHub用户名>` 用 `dawnwhales`，`<TOKEN>` 用你在 GitHub 生成的 Personal Access Token（Settings → Developer settings → Personal access tokens → Tokens (classic) → Generate new token → 勾 `repo` → Generate → 复制）。
+复制下面命令逐条执行。占位符只有一个：`<你的GitHub用户名>` 用 `vx1073071`，`<TOKEN>` 用你在 GitHub 生成的 Personal Access Token（Settings → Developer settings → Personal access tokens → Tokens (classic) → Generate new token → 勾 `repo` → Generate → 复制）。
 
 ## 1. 在 GitHub 网页建空仓库
 
 打开 https://github.com/new
-- Owner: `dawnwhales`
+- Owner: `vx1073071`
 - Repository name: `lovable-bridge-releases`
 - Public
 - **不要**勾 README / .gitignore / license
@@ -48,12 +48,12 @@ git init
 git branch -M main
 git add .
 git commit -m "init: lovable bridge v0.1.0"
-git remote add origin https://github.com/dawnwhales/lovable-bridge-releases.git
+git remote add origin https://github.com/vx1073071/lovable-bridge-releases.git
 git push -u origin main
 ```
 
 推送时会要求登录：
-- Username: `dawnwhales`
+- Username: `vx1073071`
 - Password: **粘贴 Personal Access Token**（不是 GitHub 登录密码）
 
 ## 5. 打 tag 触发自动构建
@@ -65,9 +65,9 @@ git push origin bridge-v0.1.0
 
 ## 6. 等 Actions 完成（2–5 分钟）
 
-- 打开 https://github.com/dawnwhales/lovable-bridge-releases/actions
+- 打开 https://github.com/vx1073071/lovable-bridge-releases/actions
 - 等最新一行变绿勾 ✓
-- 打开 https://github.com/dawnwhales/lovable-bridge-releases/releases
+- 打开 https://github.com/vx1073071/lovable-bridge-releases/releases
 - 看到 `bridge-v0.1.0` 带 4 个 zip/tar.gz + `latest.json` 就成功了
 
 ## 7. 回 Lovable 聊天框发一句「发好了」

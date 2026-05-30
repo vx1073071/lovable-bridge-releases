@@ -4,11 +4,11 @@
 
 ## 首次发布到 GitHub Release（必读）
 
-二进制托管在 **独立仓库** `dawnwhales/lovable-bridge-releases`，与本 Lovable 项目分离。
+二进制托管在 **独立仓库** `vx1073071/lovable-bridge-releases`，与本 Lovable 项目分离。
 在没有发布过 Release 前，前端 Step 2 的下载按钮会显示「安装包准备中」并禁用，
 不会出现 404。完成下列步骤后下载按钮会自动激活：
 
-1. 在 GitHub 上新建公开仓库 `dawnwhales/lovable-bridge-releases`（空仓库即可）。
+1. 在 GitHub 上新建公开仓库 `vx1073071/lovable-bridge-releases`（空仓库即可）。
 2. 把本项目的 `bridge/` 整个目录推到那个仓库的根目录（即 `bridge/index.ts` 落在仓库根的 `bridge/index.ts`）。
 3. 在该仓库根目录创建 `.github/workflows/bridge-release.yml`，内容见 [bridge-release.yml 模板](#workflow-模板)。
 4. 打 tag 并推送：`git tag bridge-v0.1.0 && git push --tags`，等 GitHub Actions 跑完，
