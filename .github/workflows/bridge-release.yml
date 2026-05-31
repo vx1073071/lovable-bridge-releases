@@ -18,6 +18,7 @@ jobs:
         with: { bun-version: latest }
 
       - name: Build all targets
+        working-directory: bridge
         run: bash scripts/build-all.sh
 
       # ── Windows Authenticode 签名（可选；缺 secrets 自动跳过）──
@@ -25,6 +26,7 @@ jobs:
       # 这里以 base64 编码的 PFX + 密码为最小可用示例。
       - name: Sign Windows binary
         if: ${{ env.WIN_PFX_BASE64 != '' }}
+        working-directory: bridge
         env:
           WIN_PFX_BASE64: ${{ secrets.WIN_PFX_BASE64 }}
           WIN_PFX_PASSWORD: ${{ secrets.WIN_PFX_PASSWORD }}
@@ -45,6 +47,7 @@ jobs:
       # 见下方 macos-sign job。
 
       - name: Bundle Windows installer
+        working-directory: bridge
         run: |
           mkdir -p out/windows
           cp dist/LovableBridge.exe out/windows/
@@ -52,6 +55,7 @@ jobs:
           (cd out/windows && zip -r ../LovableBridge-windows-x64.zip .)
 
       - name: Bundle macOS installer (arm64)
+        working-directory: bridge
         run: |
           mkdir -p out/mac-arm64
           cp dist/LovableBridge-mac-arm64 out/mac-arm64/
@@ -60,6 +64,7 @@ jobs:
           (cd out/mac-arm64 && zip -r ../LovableBridge-mac-arm64.zip .)
 
       - name: Bundle macOS installer (x64)
+        working-directory: bridge
         run: |
           mkdir -p out/mac-x64
           cp dist/LovableBridge-mac-x64 out/mac-x64/
@@ -68,9 +73,11 @@ jobs:
           (cd out/mac-x64 && zip -r ../LovableBridge-mac-x64.zip .)
 
       - name: Linux tarball
+        working-directory: bridge
         run: tar czf out/LovableBridge-linux-x64.tar.gz -C dist LovableBridge-linux-x64
 
       - name: Copy raw binaries for self-update
+        working-directory: bridge
         run: |
           cp dist/LovableBridge.exe              out/LovableBridge.exe
           cp dist/LovableBridge-mac-arm64        out/LovableBridge-mac-arm64
@@ -78,12 +85,13 @@ jobs:
           cp dist/LovableBridge-linux-x64        out/LovableBridge-linux-x64
 
       - name: Compute sha256
-        working-directory: out
+        working-directory: bridge/out
         run: |
           sha256sum LovableBridge.exe LovableBridge-mac-arm64 LovableBridge-mac-x64 LovableBridge-linux-x64 > sha256.txt
           cat sha256.txt
 
       - name: Write manifest
+        working-directory: bridge
         run: |
           TAG="${GITHUB_REF_NAME#bridge-v}"
           WIN_SHA=$(sha256sum out/LovableBridge.exe         | awk '{print $1}')
@@ -111,7 +119,7 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: out/*
+          files: bridge/out/*
           generate_release_notes: true
 
   # ── macOS 签名 + 公证（在 macOS runner 上跑；缺 secrets 自动跳过）──
@@ -126,10 +134,12 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with: { bun-version: latest }
       - name: Build mac binaries
+        working-directory: bridge
         run: |
           bun build index.ts --compile --target=bun-darwin-arm64 -o dist/LovableBridge-mac-arm64
           bun build index.ts --compile --target=bun-darwin-x64   -o dist/LovableBridge-mac-x64
       - name: Import signing cert
+        working-directory: bridge
         env:
           MAC_CERT_BASE64: ${{ secrets.MAC_CERT_BASE64 }}
           MAC_CERT_PASSWORD: ${{ secrets.MAC_CERT_PASSWORD }}
@@ -141,6 +151,7 @@ jobs:
           security import /tmp/cert.p12 -k build.keychain -P "$MAC_CERT_PASSWORD" -T /usr/bin/codesign
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k actions build.keychain
       - name: Codesign + notarize
+        working-directory: bridge
         env:
           MAC_DEV_ID: ${{ secrets.MAC_DEV_ID }}          # e.g. "Developer ID Application: Lovable Inc (TEAMID)"
           MAC_APPLE_ID: ${{ secrets.MAC_APPLE_ID }}
@@ -157,4 +168,4 @@ jobs:
       - name: Upload signed mac binaries to release
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/LovableBridge-mac-*
+          files: bridge/dist/LovableBridge-mac-*
