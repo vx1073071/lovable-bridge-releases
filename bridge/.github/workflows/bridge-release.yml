@@ -26,6 +26,7 @@ jobs:
       # 这里以 base64 编码的 PFX + 密码为最小可用示例。
       - name: Sign Windows binary
         if: ${{ env.WIN_PFX_BASE64 != '' }}
+        working-directory: bridge
         env:
           WIN_PFX_BASE64: ${{ secrets.WIN_PFX_BASE64 }}
           WIN_PFX_PASSWORD: ${{ secrets.WIN_PFX_PASSWORD }}
@@ -36,9 +37,9 @@ jobs:
             -pkcs12 /tmp/cert.pfx -pass "$WIN_PFX_PASSWORD" \
             -n "Lovable Bridge" -i "https://lovable.dev" \
             -t http://timestamp.digicert.com \
-            -in bridge/dist/LovableBridge.exe \
-            -out bridge/dist/LovableBridge.signed.exe
-          mv bridge/dist/LovableBridge.signed.exe bridge/dist/LovableBridge.exe
+            -in dist/LovableBridge.exe \
+            -out dist/LovableBridge.signed.exe
+          mv dist/LovableBridge.signed.exe dist/LovableBridge.exe
           rm -f /tmp/cert.pfx
 
       # ── macOS codesign + notarytool（需要 macOS runner）──
@@ -135,9 +136,10 @@ jobs:
       - name: Build mac binaries
         working-directory: bridge
         run: |
-          bun build index.ts --compile --target=bun-darwin-arm64 -o dist/LovableBridge-mac-arm64
-          bun build index.ts --compile --target=bun-darwin-x64   -o dist/LovableBridge-mac-x64
+          bun build index.ts --compile --target=bun-darwin-arm64 --outfile=dist/LovableBridge-mac-arm64
+          bun build index.ts --compile --target=bun-darwin-x64   --outfile=dist/LovableBridge-mac-x64
       - name: Import signing cert
+        working-directory: bridge
         env:
           MAC_CERT_BASE64: ${{ secrets.MAC_CERT_BASE64 }}
           MAC_CERT_PASSWORD: ${{ secrets.MAC_CERT_PASSWORD }}
@@ -149,12 +151,12 @@ jobs:
           security import /tmp/cert.p12 -k build.keychain -P "$MAC_CERT_PASSWORD" -T /usr/bin/codesign
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k actions build.keychain
       - name: Codesign + notarize
+        working-directory: bridge
         env:
           MAC_DEV_ID: ${{ secrets.MAC_DEV_ID }}          # e.g. "Developer ID Application: Lovable Inc (TEAMID)"
           MAC_APPLE_ID: ${{ secrets.MAC_APPLE_ID }}
           MAC_TEAM_ID: ${{ secrets.MAC_TEAM_ID }}
           MAC_NOTARY_PWD: ${{ secrets.MAC_NOTARY_PWD }}  # app-specific password
-        working-directory: bridge
         run: |
           for bin in dist/LovableBridge-mac-arm64 dist/LovableBridge-mac-x64; do
             codesign --force --options runtime --timestamp --sign "$MAC_DEV_ID" "$bin"
