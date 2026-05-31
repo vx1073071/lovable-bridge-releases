@@ -136,8 +136,8 @@ jobs:
       - name: Build mac binaries
         working-directory: bridge
         run: |
-          bun build index.ts --compile --target=bun-darwin-arm64 -o dist/LovableBridge-mac-arm64
-          bun build index.ts --compile --target=bun-darwin-x64   -o dist/LovableBridge-mac-x64
+          bun build --compile --target=bun-darwin-arm64 --outfile=dist/LovableBridge-mac-arm64 index.ts
+          bun build --compile --target=bun-darwin-x64   --outfile=dist/LovableBridge-mac-x64 index.ts
       - name: Import signing cert
         working-directory: bridge
         env:
