@@ -1,6 +1,6 @@
 {
   "name": "lovable-bridge",
-  "version": "0.1.0",
+  "version": "0.4.0",
   "private": true,
   "description": "Lovable Bridge — 本机守护进程，转发 Cloud ↔ FutuOpenD",
   "scripts": {
@@ -11,7 +11,9 @@
     "build:linux":   "bun build --compile --target=bun-linux-x64   --outfile=dist/LovableBridge-linux-x64 index.ts",
     "build:all":     "bash scripts/build-all.sh"
   },
-  "optionalDependencies": {
-    "futu-api": "*"
+  "dependencies": {
+    "futu-api": "^10.6.6608",
+    "protobufjs": "^7.4.0",
+    "long": "^5.2.3"
   }
 }
